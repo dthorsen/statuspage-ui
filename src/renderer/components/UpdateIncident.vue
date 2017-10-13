@@ -1,9 +1,6 @@
 <template>
   <div class="container">
     <div class="row">
-      <div class="col s3">
-        <SideNavBar/>
-      </div>
       <div class="col s9">
         <div class="row">
           <form action="#" onsubmit="javascript:createIncident()" method="POST" class="col s12">
@@ -46,11 +43,8 @@
 </template>
 
 <script>
-  import SideNavBar from './SideNavBar.vue'
-
   export default {
     name: 'UpdateIncident',
-    components: { SideNavBar },
     props: ['token', 'pageID', 'baseAPIURL'],
     created () {
       this.getIncident()

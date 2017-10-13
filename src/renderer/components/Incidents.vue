@@ -1,9 +1,6 @@
 <template>
   <div class="container" id="incidents_container">
     <div class="row">
-      <div class="col s3">
-        <SideNavBar/>
-      </div>
       <div class="col s9">
         <div v-if="loading">Loading Incidents from statuspage.io API...
           <div class="preloader-wrapper small active">
@@ -36,13 +33,8 @@
 </template>
 
 <script>
-  import SideNavBar from './SideNavBar.vue'
-
-  console.log(SideNavBar)
-
   export default {
     name: 'Incidents',
-    components: { SideNavBar },
     props: ['token', 'pageID', 'baseAPIURL'],
     created () {
       this.getIncidentList()

@@ -1,44 +1,39 @@
 <template>
-  <div class="container" id="components_container">
-    <div class="row">
-      <div class="col s3">
-        <SideNavBar/>
-      </div>
-      <div class="col s9">
-        <div class ="row" v-if="loading">Loading Components from statuspage.io API...
-          <div class="preloader-wrapper small active">
-            <div class="spinner-layer spinner-green-only">
-              <div class="circle-clipper left">
-                <div class="circle"></div>
-              </div>
-              <div class="gap-patch">
-                <div class="circle"></div>
-              </div>
-              <div class="circle-clipper right">
-                <div class="circle"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-          <div class="row" v-for="Item in StatusPageComponents" :key="Item.id">
-              <div class="col s4">{{ Item.name }}</div>
-              <div class="col s4">
-                <MaterialSelect v-model="Item.status" :options="statuses" :label="'Status'"></MaterialSelect>
-              </div>
-              <div class="col s4"><a href="#" v-on:click="updateComponent(Item.id, Item.status)">Update</a></div>
-          </div>
-      </div>
-    </div>
-  </div>
+  <v-container grid-list-md>
+    <v-layout row wrap v-if="updateSuccess">
+      <v-flex green xs12>
+        <v-alert icon="check_circle" dismissible v-model="updateSuccess">
+          Updated component status
+        </v-alert>
+      </v-flex>
+    </v-layout>
+    <v-layout row wrap v-if="updateFailed">
+      <v-flex red xs12>
+        <v-alert green icon="warning" dismissible v-model="updateFailed">
+          Error updating component: {{updateError}}
+        </v-alert>
+      </v-flex>
+    </v-layout>
+    <v-layout row wrap v-if="loading">
+      <v-flex xs12>Loading Components from statuspage.io API...
+        <v-progress-circular indeterminate v-bind:width="3"></v-progress-circular>
+      </v-flex>
+    </v-layout>
+    <v-layout row v-for="Item in StatusPageComponents" :key="Item.id">
+      <v-flex xs5>{{ Item.name }}</v-flex>
+      <v-flex xs3>
+        <v-select label="Status" v-model="Item.status" :items="statuses"></v-select>
+      </v-flex>
+      <v-flex xs4>
+        <v-btn @click="updateComponent(Item.id, Item.status)">Update</v-btn>
+      </v-flex>
+    </v-layout>
+  </v-container>
 </template>
 
 <script>
-  import SideNavBar from './SideNavBar.vue'
-  import MaterialSelect from './MaterialSelect.vue'
-
   export default {
     name: 'ComponentList',
-    components: { SideNavBar, MaterialSelect },
     props: ['token', 'pageID', 'baseAPIURL'],
     created () {
       this.getComponentList()
@@ -51,10 +46,17 @@
         this.loading = true
         var oReq = new XMLHttpRequest()
         oReq.onload = (e) => {
+          var componentKeys = []
+          var componentMap = {}
           for (var Item in e.target.response) {
-            this.loading = false
-            this.StatusPageComponents.push(e.target.response[Item])
+            componentMap[e.target.response[Item].name] = Item
+            componentKeys.push(e.target.response[Item].name)
           }
+          componentKeys.sort()
+          for (Item in componentKeys) {
+            this.StatusPageComponents.push(e.target.response[componentMap[componentKeys[Item]]])
+          }
+          this.loading = false
         }
         oReq.open('GET', this.baseAPIURL + this.pageID + '/components.json', true)
         oReq.responseType = 'json'
@@ -75,15 +77,24 @@
           }
         }
 
-        var callback = function (response) {
+        var callback = (response) => {
           var str = ''
           response.on('data', function (chunk) {
             str += chunk
           })
 
-          response.on('end', function () {
+          response.on('end', () => {
             console.log(str)
-            window.alert(response.statusCode + ' ' + response.statusMessage)
+            console.log('Response code: ' + response.statusCode)
+            if (response.statusCode === 200) {
+              this.updateSuccess = true
+            } else {
+              this.updateFailed = true
+              this.updateError = response.statusCode + ' ' + response.statusMessage + ' '
+              var errorData = JSON.parse(str)
+              console.log(errorData.error)
+              this.updateError += errorData.error
+            }
           })
         }
         var req = http.request(options, callback)
@@ -96,6 +107,9 @@
     data () {
       return {
         loading: false,
+        updateSuccess: false,
+        updateFailed: false,
+        updateError: '',
         StatusPageComponents: [],
         statuses: [
           'operational',
