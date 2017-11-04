@@ -2,6 +2,20 @@
 
 > A UI for statuspage.io
 
+[![Travis Build Status](https://travis-ci.org/dthorsen/statuspage-ui.svg?branch=master)](https://travis-ci.org/dthorsen/statuspage-ui) [![Build status](https://ci.appveyor.com/api/projects/status/3uq9xa7efhoddhmp/branch/master?svg=true)](https://ci.appveyor.com/project/dthorsen/statuspage-ui/branch/master)
+
+#### Configuration
+You will need to create a configuration file at ~/.statuspage-ui. Here is an example
+configuration file.
+
+```
+{
+  "baseAPIURL": "https://api.statuspage.io/v1/pages/",
+  "pageID": "<your_page_id>",
+  "token": "<your_api_token>"
+}
+```
+
 #### Build Setup
 
 ``` bash
