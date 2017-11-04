@@ -1,19 +1,16 @@
 <template>
   <v-container grid-list-md>
-    <v-layout row wrap v-if="updateSuccess">
-      <v-flex green xs12>
-        <v-alert icon="check_circle" dismissible v-model="updateSuccess">
-          Updated component status
-        </v-alert>
-      </v-flex>
-    </v-layout>
-    <v-layout row wrap v-if="updateFailed">
-      <v-flex red xs12>
-        <v-alert green icon="warning" dismissible v-model="updateFailed">
-          Error updating component: {{updateError}}
-        </v-alert>
-      </v-flex>
-    </v-layout>
+    <v-snackbar :timeout="60000"
+      :success="context === 'success'"
+      :info="context === 'info'"
+      :warning="context === 'warning'"
+      :error="context === 'error'"
+      :multi-line="true"
+      v-model="snackbar"
+      :top="true">
+      {{ snackText }}
+      <v-btn dark flat @click.native="snackbar = false">Close</v-btn>
+    </v-snackbar>
     <v-layout row wrap v-if="loading">
       <v-flex xs12>Loading Components from statuspage.io API...
         <v-progress-circular indeterminate v-bind:width="3"></v-progress-circular>
@@ -25,7 +22,7 @@
         <v-select label="Status" v-model="Item.status" :items="statuses"></v-select>
       </v-flex>
       <v-flex xs4>
-        <v-btn @click="updateComponent(Item.id, Item.status)">Update</v-btn>
+        <v-btn @click="updateComponent(Item.id, Item.status)" :loading="updateLoading[Item.id]">Update</v-btn>
       </v-flex>
     </v-layout>
   </v-container>
@@ -51,6 +48,7 @@
           for (var Item in e.target.response) {
             componentMap[e.target.response[Item].name] = Item
             componentKeys.push(e.target.response[Item].name)
+            this.$set(this.updateLoading, e.target.response[Item].id, false)
           }
           componentKeys.sort()
           for (Item in componentKeys) {
@@ -64,6 +62,8 @@
         oReq.send()
       },
       updateComponent (componentId, status) {
+        this.updateLoading[componentId] = true
+        console.log(this.updateLoading)
         console.log('form submitted: ')
         var http = require('https')
         var options = {
@@ -84,16 +84,20 @@
           })
 
           response.on('end', () => {
+            this.updateLoading[componentId] = false
             console.log(str)
             console.log('Response code: ' + response.statusCode)
             if (response.statusCode === 200) {
-              this.updateSuccess = true
+              this.context = 'success'
+              this.snackText = 'Successfully updated incident: ' + response.statusCode + ' ' + response.statusMessage
+              this.snackbar = true
             } else {
-              this.updateFailed = true
-              this.updateError = response.statusCode + ' ' + response.statusMessage + ' '
+              this.context = 'error'
+              this.snackText = 'Error updating component status: ' + response.statusCode + ' ' + response.statusMessage + ' - '
               var errorData = JSON.parse(str)
               console.log(errorData.error)
-              this.updateError += errorData.error
+              this.snackText += errorData.error
+              this.snackbar = true
             }
           })
         }
@@ -110,12 +114,16 @@
         updateSuccess: false,
         updateFailed: false,
         updateError: '',
+        updateLoading: {},
         StatusPageComponents: [],
         statuses: [
           'operational',
           'degraded_performance',
           'partial_outage',
-          'major_outage']
+          'major_outage'],
+        snackbar: false,
+        snackText: '',
+        context: ''
       }
     }
   }

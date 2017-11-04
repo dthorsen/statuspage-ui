@@ -1,19 +1,16 @@
 <template>
   <v-container fluid>
-    <v-layout row :align-center="true" v-if="createSuccess">
-      <v-flex green xs12>
-        <v-alert icon="check_circle" dismissible v-model="createSuccess">
-          Successfully created incident
-        </v-alert>
-      </v-flex>
-    </v-layout>
-    <v-layout row :align-center="true" v-if="createFailed">
-      <v-flex red xs12>
-        <v-alert green icon="warning" dismissible v-model="createFailed">
-          Error creating incident: {{createError}}
-        </v-alert>
-      </v-flex>
-    </v-layout>
+    <v-snackbar :timeout="60000"
+      :success="context === 'success'"
+      :info="context === 'info'"
+      :warning="context === 'warning'"
+      :error="context === 'error'"
+      :multi-line="true"
+      v-model="snackbar"
+      :top="true">
+      {{ snackText }}
+      <v-btn dark flat @click.native="snackbar = false">Close</v-btn>
+    </v-snackbar>
     <v-layout row :align-center="true">
       <v-flex xs3><v-switch v-bind:label="`Scheduled`" v-model="scheduled"></v-switch></v-flex>
       <v-flex xs9></v-flex>
@@ -112,14 +109,18 @@
           oReq.onload = (e) => {
             this.loading = false
             if (e.target.status === 201) {
-              this.createSuccess = true
+              this.context = 'success'
+              this.snackText = 'Successfully created incident'
+              this.snackbar = true
             } else {
-              this.createFailed = true
               console.log(oReq)
-              this.createError = 'HTTP Status Code: ' + e.target.status
-              this.createError += ' ' + e.target.statusText
               console.log(oReq.response)
-              this.createError += oReq.response.error
+              this.context = 'error'
+              this.snackText = 'Error creating incident: '
+              this.snackText += 'HTTP Status Code: ' + e.target.status
+              this.snackText += ' ' + e.target.statusText + ' - '
+              this.snackText += oReq.response.error
+              this.snackbar = true
             }
             console.log(e.target.response)
           }
@@ -214,9 +215,9 @@
           'major',
           'critical'
         ],
-        createSuccess: false,
-        createFailed: false,
-        createError: '',
+        snackbar: false,
+        snackText: '',
+        context: '',
         timeRules: [
           (v) => !!v || 'Time is required',
           (v) => /^[0-2][0-9]:[0-5][0-9]$/.test(v) || 'Time must be in HH:MM 24h format'

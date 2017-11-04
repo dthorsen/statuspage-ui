@@ -2,6 +2,18 @@
 
 > A UI for statuspage.io
 
+#### Configuration
+You will need to create a configuration file at ~/.statuspage-ui. Here is an example
+configuration file.
+
+```
+{
+  "baseAPIURL": "https://api.statuspage.io/v1/pages/",
+  "pageID": "<your_page_id>",
+  "token": "<your_api_token>"
+}
+```
+
 #### Build Setup
 
 ``` bash
