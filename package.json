@@ -23,8 +23,8 @@
     "postinstall": "npm run lint:fix"
   },
   "build": {
-    "productName": "mytest",
-    "appId": "org.simulatedgreg.electron-vue",
+    "productName": "statuspage-ui",
+    "appId": "org.dthorsen.statuspage-ui",
     "directories": {
       "output": "build"
     },
