@@ -2,6 +2,8 @@
 
 > A UI for statuspage.io
 
+[![Travis Build Status](https://travis-ci.org/dthorsen/statuspage-ui.svg?branch=master)](https://travis-ci.org/dthorsen/statuspage-ui)
+
 #### Configuration
 You will need to create a configuration file at ~/.statuspage-ui. Here is an example
 configuration file.
