@@ -22,7 +22,7 @@
     </v-layout>
     <v-layout row :align-center="true">
       <v-flex xs2><v-subheader>Message</v-subheader></v-flex>
-      <v-flex xs10><v-text-field name="message" label="Message" v-model="message" multiLine :rules="requiredField" required></v-text-field></v-flex>
+      <v-flex xs10><v-textarea name="message" label="Message" v-model="message" :rules="requiredField" required></v-textarea></v-flex>
     </v-layout>
     <v-layout row :align-center="true">
       <v-flex xs2><v-subheader>Status</v-subheader></v-flex>
@@ -33,7 +33,7 @@
     <v-layout row :align-center="true">
       <v-flex xs2><v-subheader>Affected Components</v-subheader></v-flex>
       <v-flex s10>
-        <v-select v-bind:items="StatusPageComponents" v-model="affectedComponents" label="Components" item-text="label" item-value="value" autocomplete multiple chips></v-select>
+        <v-autocomplete v-bind:items="StatusPageComponents" v-model="affectedComponents" label="Components" item-text="label" item-value="value" multiple chips></v-autocomplete>
       </v-flex>
     </v-layout>
     <v-layout row :align-center="true" v-if="scheduled">

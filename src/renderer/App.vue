@@ -3,7 +3,6 @@
     <v-app :dark="dark">
       <v-navigation-drawer
         clipped
-        persistent
         enable-resize-watcher
         app
         v-model="drawer"
@@ -25,7 +24,7 @@
           </v-list-tile>
         </v-list>
       </v-navigation-drawer>
-      <v-toolbar fixed>
+      <v-toolbar fixed app clipped-left>
         <v-toolbar-side-icon @click.native.stop="drawer = !drawer"></v-toolbar-side-icon>
         <v-toolbar-title v-text="title"></v-toolbar-title>
         <v-spacer></v-spacer>
@@ -34,15 +33,15 @@
         </v-btn>
       </v-toolbar>
       <main>
-        <v-container fluid>
+        <v-content>
             <v-slide-y-transition mode="out-in">
               <router-view></router-view>
             </v-slide-y-transition>
-        </v-container>
+        </v-content>
       </main>
-      <v-footer fixed>
+      <v-footer fixed app>
         <v-spacer></v-spacer>
-        <span>&copy; 2017</span>
+        <span>&copy; 2018 Dane Thorsen</span>
       </v-footer>
     </v-app>
   </div>
