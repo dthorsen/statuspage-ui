@@ -19,6 +19,9 @@ configuration file.
 #### Build Setup
 
 ``` bash
+# set registry
+echo "registry=https://artifactory.gannettdigital.com/artifactory/api/npm/cs-node-virtual" >> ~/.npmrc
+
 # install dependencies
 npm install
 
